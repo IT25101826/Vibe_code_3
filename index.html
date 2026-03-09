@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Idea Board</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            min-height: 100vh;
+        }
+        header {
+            width: 100%;
+            background-color: #007bff; /* blue */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        main {
+            margin-top: 30px;
+            width: 90%;
+            max-width: 600px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        select, textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            font-size: 1em;
+            border-radius: 10px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>Group idea board</header>
+    <main>
+        <div class="form-group">
+            <label for="member-select">Choose a team member:</label>
+            <select id="member-select">
+                <option value="">--Select--</option>
+                <option>Member 1</option>
+                <option>Member 2</option>
+                <option>Member 3</option>
+                <option>Member 4</option>
+                <option>Member 5</option>
+                <option>Member 6</option>
+                <option>Member 7</option>
+                <option>Member 8</option>
+                <option>Member 9</option>
+                <option>Member 10</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="idea-box">Your idea:</label>
+            <textarea id="idea-box" placeholder="Enter your idea here."></textarea>
+            <button id="add-idea" style="margin-top: 10px;">Add idea</button>
+            <button id="clear-input" style="margin-top: 10px; margin-left: 10px;">Clear</button>
+        </div>
+        <div id="idea-count" style="margin-top:15px;font-weight:bold;">Total ideas: 0</div>
+        <ul id="idea-list"></ul>
+    </main>
+    <script>
+        const ideaBox = document.getElementById('idea-box');
+        const addButton = document.getElementById('add-idea');
+        const clearButton = document.getElementById('clear-input');
+        const ideaList = document.getElementById('idea-list');
+        const ideaCount = document.getElementById('idea-count');
+
+        function updateCount() {
+            ideaCount.textContent = `Total ideas: ${ideaList.children.length}`;
+        }
+
+        function addIdea() {
+            const text = ideaBox.value.trim();
+            const member = document.getElementById('member-select').value;
+            if (text === '') return;
+            const li = document.createElement('li');
+            // format: "group member - idea"
+            li.textContent = `${member}${member ? ' - ' : ''}${text}`;
+            ideaList.appendChild(li);
+            ideaBox.value = '';
+            updateCount();
+        }
+
+        addButton.addEventListener('click', addIdea);
+        clearButton.addEventListener('click', function() {
+            ideaBox.value = '';
+            document.getElementById('member-select').value = '';
+        });
+        ideaBox.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addIdea();
+            }
+        });
+    </script>
+</body>
+</html>
