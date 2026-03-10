@@ -83,6 +83,80 @@
         .course input, .course select {
             margin-top: 0.25rem;
         }
+        /* Timer Styles */
+        .timer-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 30px auto;
+        }
+        .timer-card h2 {
+            font-size: 24px;
+            margin-bottom: 24px;
+            color: #333;
+            font-weight: 600;
+        }
+        .timer-display {
+            font-size: 64px;
+            font-weight: bold;
+            margin-bottom: 32px;
+            letter-spacing: 2px;
+            color: #007bff;
+            font-variant-numeric: tabular-nums;
+            animation: pulseTimer 2s ease-in-out infinite;
+        }
+        .timer-display.running {
+            animation: pulseTimer 1.5s ease-in-out infinite;
+            color: #28a745;
+        }
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .timer-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+        .timer-btn:hover:not(:disabled) {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+        .timer-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .timer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .timer-btn.pause-btn {
+            background: #6c757d;
+        }
+        .timer-btn.pause-btn:hover:not(:disabled) {
+            background: #5a6268;
+        }
+        @keyframes pulseTimer {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.03);
+            }
+        }
+    
     </style>
 </head>
 <body>
@@ -207,9 +281,16 @@
             <button id="calculate-gpa">Calculate GPA</button>
             <p id="gpa-result">GPA: 0</p>
         </section>
-        <section id="timer-section" style="display: none;">
-            <h2>Study Timer</h2>
-            <p>Study Timer functionality will be added here.</p>
+        <section id="timer-section" style="display: none; text-align: center;">
+            <div class="timer-card">
+                <h2>⏳ Study Timer</h2>
+                <div id="timerDisplay" class="timer-display">25:00</div>
+                <div class="timer-controls">
+                    <button id="startBtn" class="timer-btn">Start</button>
+                    <button id="pauseBtn" class="timer-btn pause-btn">Pause</button>
+                    <button id="resetBtn" class="timer-btn">Reset</button>
+                </div>
+            </div>
         </section>
     </main>
     <script>
@@ -270,6 +351,117 @@
 
             const gpa = totalCredits ? (totalPoints / totalCredits).toFixed(2) : 0;
             document.getElementById('gpa-result').textContent = `GPA: ${gpa}`;
+        }
+
+        // ============================================
+        // TIMER LOGIC
+        // ============================================
+        const POMODORO_DURATION = 25 * 60; // 25 minutes in seconds
+
+        // DOM Elements
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        // Timer State
+        let timerState = {
+            totalSeconds: POMODORO_DURATION,
+            remainingSeconds: POMODORO_DURATION,
+            isRunning: false,
+            intervalId: null
+        };
+
+        /**
+         * Format seconds to MM:SS format
+         */
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        /**
+         * Update timer display
+         */
+        function updateDisplay() {
+            timerDisplay.textContent = formatTime(timerState.remainingSeconds);
+        }
+
+        /**
+         * Update button states
+         */
+        function updateButtonStates() {
+            startBtn.disabled = timerState.isRunning;
+            pauseBtn.disabled = !timerState.isRunning;
+        }
+
+        /**
+         * Decrease timer by 1 second
+         */
+        function decrementTimer() {
+            timerState.remainingSeconds--;
+            updateDisplay();
+
+            if (timerState.remainingSeconds <= 0) {
+                timerState.remainingSeconds = 0;
+                timerState.isRunning = false;
+                clearInterval(timerState.intervalId);
+                timerState.intervalId = null;
+
+                updateButtonStates();
+                updateDisplay();
+                alert("⏰ Time's up! Take a break.");
+            }
+        }
+
+        /**
+         * Start button handler
+         */
+        startBtn.addEventListener('click', function() {
+            if (timerState.isRunning) return; // Prevent multiple starts
+
+            timerState.isRunning = true;
+            updateButtonStates();
+            timerDisplay.classList.add('running');
+
+            timerState.intervalId = setInterval(decrementTimer, 1000);
+        });
+
+        /**
+         * Pause button handler
+         */
+        pauseBtn.addEventListener('click', function() {
+            if (!timerState.isRunning) return;
+
+            timerState.isRunning = false;
+            clearInterval(timerState.intervalId);
+            timerState.intervalId = null;
+            updateButtonStates();
+            timerDisplay.classList.remove('running');
+        });
+
+        /**
+         * Reset button handler
+         */
+        resetBtn.addEventListener('click', function() {
+            if (timerState.intervalId) {
+                clearInterval(timerState.intervalId);
+                timerState.intervalId = null;
+            }
+
+            timerState.isRunning = false;
+            timerState.remainingSeconds = timerState.totalSeconds;
+
+            updateDisplay();
+            updateButtonStates();
+            timerDisplay.classList.remove('running');
+        });
+
+        // Initial timer setup
+        if (timerDisplay) {
+            updateDisplay();
+            updateButtonStates();
         }
     </script>
 </body>
