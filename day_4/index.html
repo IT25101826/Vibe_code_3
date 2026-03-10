@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Toolkit</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Student Toolkit</h1>
+    </header>
+    <nav>
+        <div class="logo">
+            <!-- logo space retained but title moved to header -->
+        </div>
+        <ul class="menu">
+            <li><a href="#gpa">GPA Calculator</a></li>
+            <li><a href="#timer">Study Timer</a></li>
+        </ul>
+    </nav>
+
+    <div class="sidebar">
+        <h2>Upcoming Event</h2>
+        <div class="event">May 1: Midterm Exam</div>
+        <div class="event">June 10: Project Deadline</div>
+        <div class="event">July 20: Summer Workshop</div>
+    </div>
+
+    <div class="main">
+        <section id="gpa">
+            <h2>GPA Calculator</h2>
+            <form id="gpa-form">
+                <label>Course 1: <input type="number" step="0.01" min="0" max="4"></label><br>
+                <label>Course 2: <input type="number" step="0.01" min="0" max="4"></label><br>
+                <label>Course 3: <input type="number" step="0.01" min="0" max="4"></label><br>
+                <label>Course 4: <input type="number" step="0.01" min="0" max="4"></label><br>
+            </form>
+            <p id="gpa-result">GPA: 0</p>
+        </section>
+
+        <section id="timer">
+            <h2>Study Timer</h2>
+            <div id="timer-display">00:00</div>
+            <div id="timer-controls">
+                <button id="start-btn">Start</button>
+                <button id="stop-btn">Stop</button>
+                <button id="reset-btn">Reset</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
