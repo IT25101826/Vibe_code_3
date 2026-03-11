@@ -363,7 +363,7 @@
                 <label for="idea-box">Your idea:</label>
                 <textarea id="idea-box" placeholder="Enter your idea here."></textarea>
                 <button id="add-idea" style="margin-top: 10px;">Add idea</button>
-                <button id="clear-input" style="margin-top: 10px; margin-left: 10px;">Clear</button>
+                <button id="clear-ideas" style="margin-top: 10px; margin-left: 10px;">Clear All Ideas</button>
             </div>
             <div id="idea-count" style="margin-top:15px;font-weight:bold;">Total ideas: 0</div>
             <ul id="idea-list"></ul>
@@ -467,12 +467,35 @@
     <script>
         const ideaBox = document.getElementById('idea-box');
         const addButton = document.getElementById('add-idea');
-        const clearButton = document.getElementById('clear-input');
+        // const clearButton = document.getElementById('clear-input'); // no longer needed, replaced by clear-ideas button
         const ideaList = document.getElementById('idea-list');
         const ideaCount = document.getElementById('idea-count');
 
         function updateCount() {
             ideaCount.textContent = `Total ideas: ${ideaList.children.length}`;
+        }
+        
+        // persist ideas to localStorage so they survive refreshes
+        function saveIdeas() {
+            const items = Array.from(ideaList.children).map(li => li.textContent);
+            localStorage.setItem('ideas', JSON.stringify(items));
+        }
+
+        function loadIdeas() {
+            const stored = localStorage.getItem('ideas');
+            if (stored) {
+                try {
+                    const items = JSON.parse(stored);
+                    items.forEach(text => {
+                        const li = document.createElement('li');
+                        li.textContent = text;
+                        ideaList.appendChild(li);
+                    });
+                } catch (e) {
+                    console.error('Failed to load ideas from storage', e);
+                }
+            }
+            updateCount();
         }
 
         function addIdea() {
@@ -495,13 +518,29 @@
             ideaList.appendChild(li);
             ideaBox.value = '';
             updateCount();
+            saveIdeas(); // persist immediately
         }
 
         addButton.addEventListener('click', addIdea);
-        clearButton.addEventListener('click', function() {
-            ideaBox.value = '';
-            document.getElementById('member-select').value = '';
-        });
+        // clear-all-ideas button handles resetting form and list
+        
+        // hook new clear-all-ideas button
+        const clearIdeasBtn = document.getElementById('clear-ideas');
+        if (clearIdeasBtn) {
+            clearIdeasBtn.addEventListener('click', function() {
+                // wipe form as well as list
+                ideaBox.value = '';
+                document.getElementById('member-select').value = '';
+                while (ideaList.firstChild) {
+                    ideaList.removeChild(ideaList.firstChild);
+                }
+                updateCount();
+                localStorage.removeItem('ideas');
+            });
+        }
+        
+        // load stored ideas on page load
+        loadIdeas();
         // Section switching
         document.getElementById('gpa-btn').addEventListener('click', () => showSection('gpa-section'));
         document.getElementById('timer-btn').addEventListener('click', () => showSection('timer-section'));
