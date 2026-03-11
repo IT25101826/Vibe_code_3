@@ -479,9 +479,19 @@
             const text = ideaBox.value.trim();
             const member = document.getElementById('member-select').value;
             if (text === '') return;
+            
+            // Create the idea text that will be shown
+            const ideaText = `${member}${member ? ' - ' : ''}${text}`;
+            
+            // Check if this idea already exists
+            const existingIdeas = Array.from(ideaList.children).map(li => li.textContent);
+            if (existingIdeas.includes(ideaText)) {
+                alert('This idea has already been added!');
+                return;
+            }
+            
             const li = document.createElement('li');
-            // format: "group member - idea"
-            li.textContent = `${member}${member ? ' - ' : ''}${text}`;
+            li.textContent = ideaText;
             ideaList.appendChild(li);
             ideaBox.value = '';
             updateCount();
